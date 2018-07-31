@@ -1,0 +1,19 @@
+{
+  "name": "youtube_mp3",
+  "version": "1.0.0",
+  "description": "my entertainment app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
+  },
+  "author": "Seho Kim",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+  "engines": {
+    "node": "v8.11.3",
+    "npm": "5.6.0"
+  }
+}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <meta charset = "utf-8">
+        <meta name ="author" content ="sayho">
+        <link rel="stylesheet" href ="css/bootstrap.css">
+        <link rel="stylesheet" href ="css/site.css">
+        <link href="https://fonts.googleapis.com/css?family=Alegreya+Sans|Indie+Flower" rel="stylesheet">
+        <title>Sayho Player</title>
+        <style>
+            body {
+                font-family: 'Alegreya Sans', sans-serif;
+            }
+            tr:hover {
+                background-color: lightgray;
+            }
+            .heart {
+              width: 100px;
+              height: 100px;
+                position: relative;
+                left: 50%;
+                top: 50%;
+              transform: translate(-50%, -50%);
+                
+              background: url(http://imagizer.imageshack.com/img923/4545/XdJDuY.png) no-repeat;  
+              cursor: pointer;
+
+            }
+            
+            .heart:active {
+              background-position: -2800px 0;
+              transition: background 1s steps(28);
+            }
+        </style>
+    </head>
+
+    <body class = "text-center">
+        <header>
+          <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+            <a class="navbar-brand" href="#">MyPlayer</a>
+            <!--Navbar brand code -->
+            
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+              </ul>
+                
+              <form class="form-inline mt-2 mt-md-0">
+                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+              </form>
+                <!--Navbar buttons & search box-->
+            </div>
+          </nav>
+        </header>
+        <!-- navigation bar code -->
+
+        <h1>.</h1>
+        <h1>.</h1>
+        
+        <div id="mainPlayer"></div>
+        <!--main player-->
+        
+        <div class="container">
+            <div class="form-group">
+                <center>
+                    <input type="text" class ="form-control" style="width : 50%;" placeholder="video URL here" id="urlinput" value="JjAJ_wK9YJk">
+                    <button type="button" class="btn" onclick="loadDownpage()">Convert</button>
+                    <button type="button" class="btn" onclick="addToList()">AddToList</button>
+                    <button type="button" class="btn" onclick="playByBtn()">Play</button>
+                    <button type="button" class="btn" onclick="playNext()">Next</button>
+                </center>
+            </div>
+            <table class = "table">
+                <thead>
+                    <tr>
+                        <th>Thumbnail</th>
+                        <th>Title</th>
+                        <th>Playing</th>
+                        <th>Like</th>
+                    </tr>
+                </thead>
+                <tbody id = "my-tbody"></tbody>
+            </table>
+        </div>
+        
+    
+        <script type ="text/javascript">
+            //노래 data 형식 : (videoId, number)
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/player_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            var videoId;//current videoId
+            var player;//youtube player object
+
+            
+            function onYouTubePlayerAPIReady() {
+                player = new YT.Player('mainPlayer', {
+                  height: '360',
+                  width: '640',
+                  videoId: 'JjAJ_wK9YJk'
+                });
+            }
+            
+            function loadDownpage() {
+                videoId = document.getElementById("urlinput").value;
+                document.body.innerHTML = '<iframe src="https://www.yt-download.org/@api/button/mp3/' + videoId + '" width="100%" height="100px" scrolling="no" style="border:none;"></iframe><br><h4>다운로드 버튼이 안 나오면 아래 링크로!</h4><a href = "https://y2mate.com/kr/youtube-to-mp3/' + videoId + '">링크</a>';
+            }
+            
+            function addToList() {
+                var fullURL = document.getElementById("urlinput").value;
+                videoId = fullURL;
+                
+                var my_tbody = document.getElementById("my-tbody");
+                var row = my_tbody.insertRow(my_tbody.rows.length);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                var cell3 = row.insertCell(2);
+                var cell4 = row.insertCell(3);
+                row.setAttribute("id","ID" + my_tbody.rows.length);
+                
+                $.getJSON('https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' + videoId + '&key=AIzaSyC9dhEVxKVnAJHdDwGWOYZJwQHah7ZvzRQ', function(data) {
+                    cell1.innerHTML = "<img src='https://img.youtube.com/vi/" + videoId + "/1.jpg' onClick = play('" + videoId + "') >";
+                    cell2.innerHTML = "<p onClick = play('" + videoId + "')><br>" + data.items[0].snippet.title + "</p>";
+                    cell3.innerHTML = "<p>" + my_tbody.rows.length + "</p>";
+                    cell4.innerHTML = "<div class='heart'></div>";
+                });
+            }
+            
+            function playByBtn() {
+                videoId = document.getElementById("urlinput").value;
+                player.loadVideoById(videoId);
+            }
+            function play(number) {
+                player.loadVideoById(number);
+
+            }
+            function playNext() {
+
+            }
+            
+        </script>
+        <script src ="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script type="text/javascript" src="/js/bootstrap.js"></script>
+    </body>
+</html>
