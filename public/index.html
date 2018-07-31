@@ -3,9 +3,8 @@
     <head>
         
         <meta charset = "utf-8">
-        <meta name ="author" content ="sayho">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href ="css/bootstrap.css">
-        <link rel="stylesheet" href ="css/site.css">
         <link href="https://fonts.googleapis.com/css?family=Alegreya+Sans|Indie+Flower" rel="stylesheet">
         <title>Sayho Player</title>
         <style>
@@ -14,23 +13,6 @@
             }
             tr:hover {
                 background-color: lightgray;
-            }
-            .heart {
-              width: 100px;
-              height: 100px;
-                position: relative;
-                left: 50%;
-                top: 50%;
-              transform: translate(-50%, -50%);
-                
-              background: url(http://imagizer.imageshack.com/img923/4545/XdJDuY.png) no-repeat;  
-              cursor: pointer;
-
-            }
-            
-            .heart:active {
-              background-position: -2800px 0;
-              transition: background 1s steps(28);
             }
         </style>
     </head>
@@ -86,8 +68,8 @@
                     <tr>
                         <th>Thumbnail</th>
                         <th>Title</th>
-                        <th>Playing</th>
-                        <th>Like</th>
+                        <th>Number</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody id = "my-tbody"></tbody>
@@ -103,6 +85,29 @@
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
             var videoId;//current videoId
             var player;//youtube player object
+            var listCapacity = 0;
+
+
+            class playListElement {
+            	constructor(Id, Num) {
+            		this.Id = Id;
+            		this.Num = Num;
+            	}
+            	get Id() {
+            		return this.Id;
+            	}
+            	get Num() {
+            		return this.Num;
+            	}
+            	set setId(i) {
+            		this.Id = i;
+            	}
+            	set setNum(n) {
+            		this.Num = n;
+            	}
+            }
+            var playList = [new playListElement("ff", -1)];
+            alert(playList[0].Num);
 
             
             function onYouTubePlayerAPIReady() {
@@ -129,12 +134,12 @@
                 var cell3 = row.insertCell(2);
                 var cell4 = row.insertCell(3);
                 row.setAttribute("id","ID" + my_tbody.rows.length);
-                
+                listCapacity = listCapacity + 1;
                 $.getJSON('https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' + videoId + '&key=AIzaSyC9dhEVxKVnAJHdDwGWOYZJwQHah7ZvzRQ', function(data) {
                     cell1.innerHTML = "<img src='https://img.youtube.com/vi/" + videoId + "/1.jpg' onClick = play('" + videoId + "') >";
                     cell2.innerHTML = "<p onClick = play('" + videoId + "')><br>" + data.items[0].snippet.title + "</p>";
-                    cell3.innerHTML = "<p>" + my_tbody.rows.length + "</p>";
-                    cell4.innerHTML = "<div class='heart'></div>";
+                    cell3.innerHTML = "<h5>" + listCapacity + "</h5>"
+                    cell4.innerHTML = "<button class='btn' onclick='Delete(" + listCapacity + ")'>Delete</button>";
                 });
             }
             
@@ -148,6 +153,12 @@
             }
             function playNext() {
 
+            }
+            function Delete(Num) {
+            	document.getElementById("my-tbody").deleteRow(Num-1);
+
+            	listCapacity = listCapacity - 1;
+            	alert(Num);
             }
             
         </script>
