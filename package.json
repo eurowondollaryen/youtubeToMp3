@@ -1,19 +1,28 @@
 {
-  "name": "youtube_mp3",
+  "name": "youtubetomp3",
   "version": "1.0.0",
-  "description": "my entertainment app",
+  "description": "",
   "main": "app.js",
+  "dependencies": {
+    "express": "^4.16.3"
+  },
+  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eurowondollaryen/youtubeToMp3.git"
   },
   "author": "Seho Kim",
   "license": "ISC",
-  "dependencies": {
-    "express": "^4.16.3"
-  }
+  "bugs": {
+    "url": "https://github.com/eurowondollaryen/youtubeToMp3/issues"
+  },
   "engines": {
-    "node": "v8.11.3",
-    "npm": "5.6.0"
-  }
+  	"node": "v8.11.3",
+  	"npm": "5.6.0"
+  },
+  "homepage": "https://github.com/eurowondollaryen/youtubeToMp3#readme"
 }
