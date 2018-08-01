@@ -68,7 +68,7 @@
                     <tr>
                         <th>Thumbnail</th>
                         <th>Title</th>
-                        <th>Number</th>
+                        <th>Play</th>
                         <th>Delete</th>
                     </tr>
                 </thead>
@@ -86,28 +86,8 @@
             var videoId;//current videoId
             var player;//youtube player object
             var listCapacity = 0;
-
-
-            class playListElement {
-            	constructor(Id, Num) {
-            		this.Id = Id;
-            		this.Num = Num;
-            	}
-            	get Id() {
-            		return this.Id;
-            	}
-            	get Num() {
-            		return this.Num;
-            	}
-            	set setId(i) {
-            		this.Id = i;
-            	}
-            	set setNum(n) {
-            		this.Num = n;
-            	}
-            }
-            var playList = [new playListElement("ff", -1)];
-            alert(playList[0].Num);
+            var currentNum = -1;
+            var playList = [];
 
             
             function onYouTubePlayerAPIReady() {
@@ -136,10 +116,13 @@
                 row.setAttribute("id","ID" + my_tbody.rows.length);
                 listCapacity = listCapacity + 1;
                 $.getJSON('https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' + videoId + '&key=AIzaSyC9dhEVxKVnAJHdDwGWOYZJwQHah7ZvzRQ', function(data) {
-                    cell1.innerHTML = "<img src='https://img.youtube.com/vi/" + videoId + "/1.jpg' onClick = play('" + videoId + "') >";
-                    cell2.innerHTML = "<p onClick = play('" + videoId + "')><br>" + data.items[0].snippet.title + "</p>";
-                    cell3.innerHTML = "<h5>" + listCapacity + "</h5>"
+                    cell1.innerHTML = "<img src='https://img.youtube.com/vi/" + videoId + "/1.jpg'>";
+                    cell2.innerHTML = "<p><br>" + data.items[0].snippet.title + "</p>";
+                    cell3.innerHTML = "<button class='btn' onclick='play(&apos;" + videoId + "&apos;currentSet(" + listCapacity + ");'>Play</button>"
                     cell4.innerHTML = "<button class='btn' onclick='Delete(" + listCapacity + ")'>Delete</button>";
+                    playList.push({videoId,listCapacity});
+	                console.log(playList);
+	                console.log(playList.length);
                 });
             }
             
@@ -149,16 +132,26 @@
             }
             function play(number) {
                 player.loadVideoById(number);
-
+            }
+            function currentSet(number) {
+            	currentNum = number;
             }
             function playNext() {
-
+            	currentNum++;
+            	player.loadVideoById()
             }
             function Delete(Num) {
-            	document.getElementById("my-tbody").deleteRow(Num-1);
-
-            	listCapacity = listCapacity - 1;
-            	alert(Num);
+            	$('#ID' + Num).remove();
+            	listCapacity--;
+            	for(var i = Num+1; i <= listCapacity+1; ++i) {
+            		$("#ID" + i + " td:nth-child(4)").children().attr("onclick", "Delete(" + (i-1) + ")");
+            		$("#ID" + i).attr("id", "ID" + (i-1));
+            	}
+            	for(var i = 0; i < playList.length; ++i) {
+            		if(playList[i].listCapacity == Num) playList.splice(i,1)
+            	}
+            	console.log(playList);
+            	console.log(playList.length);
             }
             
         </script>

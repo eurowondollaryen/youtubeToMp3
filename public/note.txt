@@ -1,0 +1,53 @@
+js에서 function은 함수가 아니라 변수로 취급한다
+var a = function(x) {return x*3} 이런 식 가능
+higer order function (=callback function): function이 function의 파라미터가 되는 것(변수처럼 취급)
+
+
+*filter function : array를 filtering하는 것
+
+var animals = [
+    {name: 'a', species: 'dog'},
+    {name: 'b', species: 'cat'},
+    {name: 'c', species: 'dog'}
+]
+/*
+var dogs = animals.filter(function(animal) {
+    return animal.species === 'dog'
+})
+*/
+var isDog = function(animal) {
+    return animal.species === 'dog'
+}
+
+var dogs = animals.filter(isDog)
+var otherAnimals = animals.reject(isDog)
+
+*callback function은 filter function과 한 세트
+
+
+
+*map function? : array에서 하나의 attribute들만 뽑아서 다른 array로 만드는 function
+**arrow function
+var names = animals.map((x) => x.name) 이 코드는
+var name = animals.map(function(animal) {return animal.name}) 이 코드와 같다.
+arrow function을 통해서 더 간결하고 버그 없는 코드를 작성할 수 있음
+
+var animals = [
+    {name: 'a', species: 'dog'},
+    {name: 'b', species: 'cat'},
+    {name: 'c', species: 'dog'}
+]
+
+var names = animals.map((x) => x.name)
+
+var namess = [];
+for (var i = 0; i < animals.length; i++) {
+	namess.push(animals[i].name)
+}
+var name = animals.map(function(animal) {return animal.name})
+console.log(names)
+console.log(namess)
+console.log(name)
+
+
+-----------------------------------------------------------------
