@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        
         <meta charset = "utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href ="css/bootstrap.css">
@@ -10,6 +9,12 @@
         <style>
             body {
                 font-family: 'Alegreya Sans', sans-serif;
+            }
+            tr {
+            	transition: background-color 0.5s;
+			    -moz-transition: background-color 0.5s;
+			    -webkit-transition: background-color 0.5s;
+			    -o-transition: background-color 0.5s;
             }
             tr:hover {
                 background-color: lightgray;
@@ -33,7 +38,7 @@
                   <a class="nav-link" href="#">Home</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Link</a>
+                  <a class="nav-link" href="#">How To Use</a>
                 </li>
               </ul>
                 
@@ -55,12 +60,14 @@
         
         <div class="container">
             <div class="form-group">
+            	<div id="YouTube-player-infos"></div>
                 <center>
                     <input type="text" class ="form-control" style="width : 50%;" placeholder="video URL here" id="urlinput" value="JjAJ_wK9YJk">
-                    <button type="button" class="btn" onclick="loadDownpage()">Convert</button>
+                    <button type="button" class="btn" onclick="loadDownpage()">Convert with this Code</button>
                     <button type="button" class="btn" onclick="addToList()">AddToList</button>
-                    <button type="button" class="btn" onclick="playByBtn()">Play</button>
+                    <button type="button" class="btn" onclick="playPrev()">Prev</button>
                     <button type="button" class="btn" onclick="playNext()">Next</button>
+                    <button type="button" class="btn" id="shuffleBtn" onclick="setShuffle()">Shuffle Mode</button>
                 </center>
             </div>
             <table class = "table">
@@ -85,11 +92,12 @@
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
             var videoId;//current videoId
             var player;//youtube player object
-            var listCapacity = 0;
-            var currentNum = -1;
-            var playList = [];
+            var listCapacity = 0;//Capacity of List(**Duplicated)
+            var currentNum = -1;//Current Playing Music Number
+            var playList = [];//Playlist Array
+            var is_shuffle = 0;
+            setInterval(autoNext, 2000);
 
-            
             function onYouTubePlayerAPIReady() {
                 player = new YT.Player('mainPlayer', {
                   height: '360',
@@ -118,42 +126,90 @@
                 $.getJSON('https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' + videoId + '&key=AIzaSyC9dhEVxKVnAJHdDwGWOYZJwQHah7ZvzRQ', function(data) {
                     cell1.innerHTML = "<img src='https://img.youtube.com/vi/" + videoId + "/1.jpg'>";
                     cell2.innerHTML = "<p><br>" + data.items[0].snippet.title + "</p>";
-                    cell3.innerHTML = "<button class='btn' onclick='play(&apos;" + videoId + "&apos;currentSet(" + listCapacity + ");'>Play</button>"
+                    cell3.innerHTML = "<button class='btn' onclick='play(" + listCapacity + ");'>Play</button>"
                     cell4.innerHTML = "<button class='btn' onclick='Delete(" + listCapacity + ")'>Delete</button>";
-                    playList.push({videoId,listCapacity});
+                    playList.push({"id" : videoId,"num": listCapacity});
 	                console.log(playList);
 	                console.log(playList.length);
                 });
             }
-            
+            /*
             function playByBtn() {
                 videoId = document.getElementById("urlinput").value;
                 player.loadVideoById(videoId);
-            }
+            }*/
             function play(number) {
-                player.loadVideoById(number);
-            }
-            function currentSet(number) {
-            	currentNum = number;
+            	if(currentNum != -1) document.getElementById("ID" + currentNum).style.backgroundColor = "white";
+
+                player.loadVideoById(playList[number-1].id);
+                currentNum = number;
+                //console.log("played No." + number + " song. its ID is " + playList[number-1].id + ". CurrentNum is " + currentNum + ". ");
+
+                document.getElementById("ID" + currentNum).style.backgroundColor = "pink";
             }
             function playNext() {
-            	currentNum++;
-            	player.loadVideoById()
+            	document.getElementById("ID" + currentNum).style.backgroundColor = "white";
+            	if(is_shuffle == 0) {
+            		var size = playList.length;
+	            	currentNum = currentNum + 1;
+	            	if(size < currentNum) {
+	            		currentNum = currentNum - size;
+	            	}
+	            	//console.log("currentNum is : " + currentNum + " and playList.length is " + size);
+	            	player.loadVideoById(playList[currentNum-1].id);
+	            	//console.log("played No." + currentNum + " song. its ID is " + playList[currentNum-1].id + ". CurrentNum is " + currentNum + ". ");
+
+	            	document.getElementById("ID" + currentNum).style.backgroundColor = "pink";
+            	}
+            	else if(is_shuffle == 1) {
+            		var size = playList.length;
+            		currentNum = Math.floor(Math.random() * playList.length) + 1;
+            		player.loadVideoById(playList[currentNum-1].id);
+            		document.getElementById("ID" + currentNum).style.backgroundColor = "pink";
+            	}
+            	
+            }
+            function playPrev() {
+            	document.getElementById("ID" + currentNum).style.backgroundColor = "white";
+
+            	var size = playList.length;
+            	currentNum = currentNum - 1;
+            	if(currentNum < 1) {
+            		currentNum = size;
+            	}
+            	//console.log("currentNum is : " + currentNum + " and playList.length is " + size);
+            	player.loadVideoById(playList[currentNum-1].id);
+            	//console.log("played No." + currentNum + " song. its ID is " + playList[currentNum-1].id + ". CurrentNum is " + currentNum + ". ");
+            	document.getElementById("ID" + currentNum).style.backgroundColor = "pink";
             }
             function Delete(Num) {
             	$('#ID' + Num).remove();
             	listCapacity--;
             	for(var i = Num+1; i <= listCapacity+1; ++i) {
+            		$("#ID" + i + " td:nth-child(3)").children().attr("onclick", ";play(" + (i-1) + ");");
+            		//delete(n)을 하나 감소
             		$("#ID" + i + " td:nth-child(4)").children().attr("onclick", "Delete(" + (i-1) + ")");
+            		//id도 1 감소
             		$("#ID" + i).attr("id", "ID" + (i-1));
+
+            		playList[i-1].num--;//플레이리스트 동기화
             	}
-            	for(var i = 0; i < playList.length; ++i) {
-            		if(playList[i].listCapacity == Num) playList.splice(i,1)
-            	}
-            	console.log(playList);
-            	console.log(playList.length);
+            	playList.splice(Num-1,1);
             }
-            
+            function autoNext() {
+            	if(player.getPlayerState() == 0) playNext();
+            }
+            function setShuffle() {
+            	if(is_shuffle == 0) {
+            		is_shuffle = 1;
+            		document.getElementById("shuffleBtn").style.backgroundColor = "pink";
+
+            	}
+            	else if(is_shuffle == 1) {
+            		is_shuffle = 0;
+            		document.getElementById("shuffleBtn").style.backgroundColor = "lightgray";
+            	}
+            }
         </script>
         <script src ="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script type="text/javascript" src="/js/bootstrap.js"></script>
